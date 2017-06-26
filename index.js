@@ -130,17 +130,23 @@ class Tracker {
    * Dump the items being tracked to the console.
    */
   debug() {
+    function formatDate(date) {
+      return ('0' + date.getHours()).slice(-2) + ':' +
+             ('0' + date.getMinutes()).slice(-2) + '.' +
+             date.getMilliseconds();
+    }
+
     console.log();
     this.__items.forEach((element) => {
-      let output;
+      let output = formatDate(element.timestamp) + ' ';
 
       if (element.config) {
         // request
-        output = element.config.method.toLowerCase() + ', ';
+        output += element.config.method.toLowerCase() + ', ';
         output += element.config.url;
       } else {
         // stub
-        output = element.method.toLowerCase() + ', ';
+        output += element.method.toLowerCase() + ', ';
         output += element.url + ', ';
         output += element.response.status + ', ';
 
@@ -202,6 +208,7 @@ class Request {
     this.resolve = resolve
     this.reject = reject
     this.config = config
+    this.timestamp = new Date()
 
     this.headers = config.headers
     this.url = buildURL(config.url, config.params, config.paramsSerializer)
