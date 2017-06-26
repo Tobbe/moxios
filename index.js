@@ -202,6 +202,7 @@ class Request {
     this.resolve = resolve
     this.reject = reject
     this.config = config
+    this.timestamp = new Date()
 
     this.headers = config.headers
     this.url = buildURL(config.url, config.params, config.paramsSerializer)
