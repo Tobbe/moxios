@@ -16,7 +16,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jtbullock/moxios.git"
+    "url": "git+https://github.com/mzabriskie/moxios.git"
   },
   "keywords": [
     "axios",
