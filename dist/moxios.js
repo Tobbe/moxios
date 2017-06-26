@@ -52,7 +52,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -315,13 +315,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {Function} reject The function to call when Promise is rejected
 	   * @param {Object} config The config object to be used for the request
 	   */
+	
 	  function Request(resolve, reject, config) {
 	    _classCallCheck(this, Request);
 	
 	    this.resolve = resolve;
 	    this.reject = reject;
 	    this.config = config;
-	    this.timestamp = new Date();
 	
 	    this.headers = config.headers;
 	    this.url = (0, _buildURL2.default)(config.url, config.params, config.paramsSerializer);
@@ -426,7 +426,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * Install the mock adapter for axios
 	   */
 	  install: function install() {
-	    var instance = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _axios2.default;
+	    var instance = arguments.length <= 0 || arguments[0] === undefined ? _axios2.default : arguments[0];
 	
 	    defaultAdapter = instance.defaults.adapter;
 	    instance.defaults.adapter = mockAdapter;
@@ -436,7 +436,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * Uninstall the mock adapter and reset state
 	   */
 	  uninstall: function uninstall() {
-	    var instance = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _axios2.default;
+	    var instance = arguments.length <= 0 || arguments[0] === undefined ? _axios2.default : arguments[0];
 	
 	    instance.defaults.adapter = defaultAdapter;
 	    this.stubs.reset();
@@ -524,7 +524,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {Number} delay How much time in milliseconds to wait
 	   */
 	  wait: function wait(fn) {
-	    var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.delay;
+	    var delay = arguments.length <= 1 || arguments[1] === undefined ? this.delay : arguments[1];
 	
 	    setTimeout(fn, delay);
 	  }
@@ -533,15 +533,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = moxios;
 	module.exports = exports['default'];
 
-/***/ }),
+/***/ },
 /* 1 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 
-/***/ }),
+/***/ },
 /* 2 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -613,9 +613,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-/***/ }),
+/***/ },
 /* 3 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -918,9 +918,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-/***/ }),
+/***/ },
 /* 4 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	'use strict';
 	
@@ -935,9 +935,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-/***/ }),
+/***/ },
 /* 5 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -1009,9 +1009,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	);
 
 
-/***/ }),
+/***/ },
 /* 6 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	'use strict';
 	
@@ -1051,9 +1051,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = btoa;
 
 
-/***/ }),
+/***/ },
 /* 7 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -1110,9 +1110,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	);
 
 
-/***/ }),
+/***/ },
 /* 8 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -1141,9 +1141,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-/***/ }),
+/***/ },
 /* 9 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -1164,9 +1164,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-/***/ }),
+/***/ },
 /* 10 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	'use strict';
 	
@@ -1189,7 +1189,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-/***/ })
+/***/ }
 /******/ ])
 });
 ;
