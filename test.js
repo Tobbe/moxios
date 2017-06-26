@@ -175,6 +175,32 @@ describe('moxios', function () {
       })
     })
 
+    it('should include a timestamp', function () {
+      axios.get('/users/12345')
+
+      return moxios.wait().then(function () {
+        const request = moxios.requests.mostRecent()
+        const timestamp = moxios.requests.mostRecent().timestamp;
+        const diff = Date.now() - timestamp.getTime();
+        equal(diff >= 0 && diff <= 1000, true);
+      })
+    })
+
+    it('should include timestamp in debug output', function () {
+      axios.get('/users/12345')
+      axios.get('/users/12346')
+      axios.delete('/users/12345')
+
+      return moxios.wait(function () {
+        const logs = [];
+        let log = sinon.stub(console, 'log', str => logs.push(str));
+        moxios.requests.debug();
+        log.restore();
+
+        equal(logs.filter(str => str).every(str => str.match(/^\d\d:\d\d\.\d{1,3}/)), true);
+      })
+    })
+
     describe('stubs', function () {
       it('should track multiple stub requests', function () {
         moxios.stubOnce('PUT', '/users/12345', {
