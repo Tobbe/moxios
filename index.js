@@ -88,7 +88,19 @@ class Tracker {
    * @param {Object} item An item to be tracked
    */
   track(item) {
-    this.__items.push(item)
+    let index = -1;
+
+    if (item.url) {
+      index = this.__items.findIndex(stub =>
+        stub.url.toString() === item.url.toString()
+          && stub.method === item.method);
+    }
+
+    if (index >= 0) {
+      this.__items[index] = item;
+    } else {
+      this.__items.push(item);
+    }
   }
 
   /**

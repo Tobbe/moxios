@@ -364,6 +364,77 @@ describe('moxios', function () {
           done()
         })
       })
+
+      it('should remove stubs when uninstalling', function () {
+        moxios.stubRequest('/users/12345', {
+          status: 200,
+          response: USER_FRED
+        })
+
+        equal(moxios.stubs.count(), 1);
+
+        moxios.uninstall();
+
+        equal(moxios.stubs.count(), 0);
+
+        moxios.stubRequest('/users/12346', {
+          status: 200,
+          response: USER_FRED
+        })
+
+        equal(moxios.stubs.count(), 1);
+      })
+
+      it('should replace existing stub when stubbing same url and method', function () {
+        moxios.stubRequest('/users/12346', {
+          status: 200,
+          response: USER_FRED
+        })
+
+        moxios.stubRequest('/users/12346', {
+          status: 500
+        })
+
+        let status;
+        return axios.get('/users/12346')
+          .then(response => status = response.status)
+          .catch(error => status = error.response.status)
+          .then(_ => equal(status, 500))
+      })
+
+      it('should not replace existing stubb for different url', function () {
+        moxios.stubRequest('/users/12346', {
+          status: 200,
+          response: USER_FRED
+        })
+
+        moxios.stubRequest('/users/12345', {
+          status: 500
+        })
+
+        let status;
+        return axios.get('/users/12346')
+          .then(response => status = response.status)
+          .catch(error => status = error.response.status)
+          .then(_ => equal(status, 200))
+      })
+
+      it('should not replace existing stubb for different method', function () {
+        moxios.stubOnce('GET', '/users/12346', {
+          status: 200,
+          response: USER_FRED
+        })
+
+        moxios.stubOnce('POST', '/users/12346', {
+          status: 500
+        })
+
+        let status;
+        return axios.get('/users/12346')
+          .then(response => status = response.status)
+          .catch(error => status = error.response.status)
+          .then(_ => equal(status, 200))
+      })
     })
 
     describe('wait', function() {
