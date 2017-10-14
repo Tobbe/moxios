@@ -59,6 +59,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.createMoxios = undefined;
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
@@ -438,131 +439,134 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.code = res.code;
 	};
 	
-	var moxios = {
-	  stubs: new Tracker(),
-	  requests: new Tracker(),
-	  delay: DEFAULT_WAIT_DELAY,
-	  timeoutException: TimeoutException,
+	var createMoxios = exports.createMoxios = function createMoxios() {
+	  return {
+	    stubs: new Tracker(),
+	    requests: new Tracker(),
+	    delay: DEFAULT_WAIT_DELAY,
+	    timeoutException: TimeoutException,
 	
-	  /**
-	   * Install the mock adapter for axios
-	   */
-	  install: function install() {
-	    var instance = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _axios2.default;
+	    /**
+	     * Install the mock adapter for axios
+	     */
+	    install: function install() {
+	      var instance = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _axios2.default;
 	
-	    defaultAdapter = instance.defaults.adapter;
-	    instance.defaults.adapter = mockAdapter;
-	  },
+	      defaultAdapter = instance.defaults.adapter;
+	      instance.defaults.adapter = mockAdapter;
+	    },
 	
-	  /**
-	   * Uninstall the mock adapter and reset state
-	   */
-	  uninstall: function uninstall() {
-	    var instance = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _axios2.default;
+	    /**
+	     * Uninstall the mock adapter and reset state
+	     */
+	    uninstall: function uninstall() {
+	      var instance = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _axios2.default;
 	
-	    instance.defaults.adapter = defaultAdapter;
-	    this.stubs.reset();
-	    this.requests.reset();
-	  },
+	      instance.defaults.adapter = defaultAdapter;
+	      this.stubs.reset();
+	      this.requests.reset();
+	    },
 	
-	  /**
-	   * Stub a response to be used to respond to a request matching a method and a URL or RegExp
-	   *
-	   * @param {String} method An axios command
-	   * @param {String|RegExp} urlOrRegExp A URL or RegExp to test against
-	   * @param {Object} response The response to use when a match is made
-	   */
-	  stubRequest: function stubRequest(method, urlOrRegExp, response) {
-	    this.stubs.track({ url: urlOrRegExp, method: method, response: response });
-	  },
+	    /**
+	     * Stub a response to be used to respond to a request matching a method and a URL or RegExp
+	     *
+	     * @param {String} method An axios command
+	     * @param {String|RegExp} urlOrRegExp A URL or RegExp to test against
+	     * @param {Object} response The response to use when a match is made
+	     */
+	    stubRequest: function stubRequest(method, urlOrRegExp, response) {
+	      this.stubs.track({ url: urlOrRegExp, method: method, response: response });
+	    },
 	
-	  /**
-	   * Stub a response to be used one or more times to respond to a request matching a
-	   * method and a URL or RegExp.
-	   *
-	   * @param {String} method An axios command
-	   * @param {String|RegExp} urlOrRegExp A URL or RegExp to test against
-	   * @param {Object} response The response to use when a match is made
-	   */
-	  stubOnce: function stubOnce(method, urlOrRegExp, response) {
-	    var _this = this;
+	    /**
+	     * Stub a response to be used one or more times to respond to a request matching a
+	     * method and a URL or RegExp.
+	     *
+	     * @param {String} method An axios command
+	     * @param {String|RegExp} urlOrRegExp A URL or RegExp to test against
+	     * @param {Object} response The response to use when a match is made
+	     */
+	    stubOnce: function stubOnce(method, urlOrRegExp, response) {
+	      var _this = this;
 	
-	    return new Promise(function (resolve) {
-	      _this.stubs.track({ url: urlOrRegExp, method: method, response: response, resolve: resolve });
-	    });
-	  },
+	      return new Promise(function (resolve) {
+	        _this.stubs.track({ url: urlOrRegExp, method: method, response: response, resolve: resolve });
+	      });
+	    },
 	
-	  /**
-	   * Stub a timed response to a request matching a method and a URL or RegExp. If
-	   * timer fires, reject with a TimeoutException for simple assertions. The goal is
-	   * to show that a certain request was not made.
-	   *
-	   * @param {String} method An axios command
-	   * @param {String|RegExp} urlOrRegExp A URL or RegExp to test against
-	   * @param {Object} response The response to use when a match is made
-	   */
-	  stubFailure: function stubFailure(method, urlOrRegExp, response) {
-	    var _this2 = this;
+	    /**
+	     * Stub a timed response to a request matching a method and a URL or RegExp. If
+	     * timer fires, reject with a TimeoutException for simple assertions. The goal is
+	     * to show that a certain request was not made.
+	     *
+	     * @param {String} method An axios command
+	     * @param {String|RegExp} urlOrRegExp A URL or RegExp to test against
+	     * @param {Object} response The response to use when a match is made
+	     */
+	    stubFailure: function stubFailure(method, urlOrRegExp, response) {
+	      var _this2 = this;
 	
-	    return new Promise(function (resolve, reject) {
-	      _this2.stubs.track({ url: urlOrRegExp, method: method, response: response, resolve: resolve });
-	      setTimeout(function () {
-	        reject(TimeoutException);
-	      }, 500);
-	    });
-	  },
+	      return new Promise(function (resolve, reject) {
+	        _this2.stubs.track({ url: urlOrRegExp, method: method, response: response, resolve: resolve });
+	        setTimeout(function () {
+	          reject(TimeoutException);
+	        }, 500);
+	      });
+	    },
 	
-	  /**
-	   * Stub a timeout to be used to respond to a request matching a URL or RegExp
-	   *
-	   * @param {String|RegExp} urlOrRegExp A URL or RegExp to test against
-	   */
-	  stubTimeout: function stubTimeout(urlOrRegExp) {
-	    this.stubs.track({ url: urlOrRegExp, timeout: true });
-	  },
+	    /**
+	     * Stub a timeout to be used to respond to a request matching a URL or RegExp
+	     *
+	     * @param {String|RegExp} urlOrRegExp A URL or RegExp to test against
+	     */
+	    stubTimeout: function stubTimeout(urlOrRegExp) {
+	      this.stubs.track({ url: urlOrRegExp, timeout: true });
+	    },
 	
-	  /**
-	   * Run a single test with mock adapter installed.
-	   * This will install the mock adapter, execute the function provided,
-	   * then uninstall the mock adapter once complete.
-	   *
-	   * @param {Function} fn The function to be executed
-	   */
-	  withMock: function withMock(fn) {
-	    this.install();
-	    try {
-	      fn();
-	    } finally {
-	      this.uninstall();
+	    /**
+	     * Run a single test with mock adapter installed.
+	     * This will install the mock adapter, execute the function provided,
+	     * then uninstall the mock adapter once complete.
+	     *
+	     * @param {Function} fn The function to be executed
+	     */
+	    withMock: function withMock(fn) {
+	      this.install();
+	      try {
+	        fn();
+	      } finally {
+	        this.uninstall();
+	      }
+	    },
+	
+	    /**
+	     * Wait for request to be made before proceding.
+	     * This is naively using a `setTimeout`.
+	     * May need to beef this up a bit in the future.
+	     *
+	     * @param {Function} fn Optional function to execute once waiting is over
+	     * @param {Number} delay How much time in milliseconds to wait
+	     *
+	     * @return {Object} Promise that gets resolved when waiting completed
+	     */
+	    wait: function wait() {
+	      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	        args[_key] = arguments[_key];
+	      }
+	
+	      var cb = typeof args[0] === 'function' ? args.shift() : null;
+	      var delay = typeof args[0] !== 'undefined' ? args.shift() : this.delay;
+	
+	      return new Promise(function (resolve) {
+	        setTimeout(resolve, delay);
+	      }).then(cb);
 	    }
-	  },
-	
-	  /**
-	   * Wait for request to be made before proceding.
-	   * This is naively using a `setTimeout`.
-	   * May need to beef this up a bit in the future.
-	   *
-	   * @param {Function} fn Optional function to execute once waiting is over
-	   * @param {Number} delay How much time in milliseconds to wait
-	   *
-	   * @return {Object} Promise that gets resolved when waiting completed
-	   */
-	  wait: function wait() {
-	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	      args[_key] = arguments[_key];
-	    }
-	
-	    var cb = typeof args[0] === 'function' ? args.shift() : null;
-	    var delay = typeof args[0] !== 'undefined' ? args.shift() : this.delay;
-	
-	    return new Promise(function (resolve) {
-	      setTimeout(resolve, delay);
-	    }).then(cb);
-	  }
+	  };
 	};
 	
+	var moxios = createMoxios();
+	
 	exports.default = moxios;
-	module.exports = exports['default'];
 
 /***/ }),
 /* 1 */
