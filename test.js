@@ -117,7 +117,7 @@ describe('moxios', function () {
     })
 
     it('should stub requests', function (done) {
-      moxios.stubRequest('/users/12345', {
+      moxios.stubRequest('get', '/users/12345', {
         status: 200,
         response: USER_FRED
       })
@@ -132,7 +132,7 @@ describe('moxios', function () {
     })
 
     it('should stub requests with callback', function (done) {
-      moxios.stubRequest('/whoami', (request) => {
+      moxios.stubRequest('get', '/whoami', (request) => {
         return {
           status:   200,
           response: request.url
@@ -161,7 +161,7 @@ describe('moxios', function () {
     })
 
     it('should stub requests RegExp', function (done) {
-      moxios.stubRequest(/\/users\/\d*/, {
+      moxios.stubRequest('get', /\/users\/\d*/, {
         status: 200,
         response: USER_FRED
       })
@@ -366,7 +366,7 @@ describe('moxios', function () {
       })
 
       it('should remove stubs when uninstalling', function () {
-        moxios.stubRequest('/users/12345', {
+        moxios.stubRequest('get', '/users/12345', {
           status: 200,
           response: USER_FRED
         })
@@ -377,7 +377,7 @@ describe('moxios', function () {
 
         equal(moxios.stubs.count(), 0);
 
-        moxios.stubRequest('/users/12346', {
+        moxios.stubRequest('get', '/users/12346', {
           status: 200,
           response: USER_FRED
         })
@@ -386,12 +386,12 @@ describe('moxios', function () {
       })
 
       it('should replace existing stub when stubbing same url and method', function () {
-        moxios.stubRequest('/users/12346', {
+        moxios.stubRequest('get', '/users/12346', {
           status: 200,
           response: USER_FRED
         })
 
-        moxios.stubRequest('/users/12346', {
+        moxios.stubRequest('get', '/users/12346', {
           status: 500
         })
 
@@ -403,12 +403,12 @@ describe('moxios', function () {
       })
 
       it('should not replace existing stubb for different url', function () {
-        moxios.stubRequest('/users/12346', {
+        moxios.stubRequest('get', '/users/12346', {
           status: 200,
           response: USER_FRED
         })
 
-        moxios.stubRequest('/users/12345', {
+        moxios.stubRequest('get', '/users/12345', {
           status: 500
         })
 
