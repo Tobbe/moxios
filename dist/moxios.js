@@ -472,8 +472,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {String|RegExp} urlOrRegExp A URL or RegExp to test against
 	   * @param {Object} response The response to use when a match is made
 	   */
-	  stubRequest: function stubRequest(urlOrRegExp, response) {
-	    this.stubs.track({ url: urlOrRegExp, response: response });
+	  stubRequest: function stubRequest(method, urlOrRegExp, response) {
+	    this.stubs.track({ url: urlOrRegExp, method: method, response: response });
 	  },
 	
 	  /**

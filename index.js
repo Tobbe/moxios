@@ -338,8 +338,8 @@ let moxios = {
    * @param {String|RegExp} urlOrRegExp A URL or RegExp to test against
    * @param {Object} response The response to use when a match is made
    */
-  stubRequest: function (urlOrRegExp, response) {
-    this.stubs.track({url: urlOrRegExp, response});
+  stubRequest: function (method, urlOrRegExp, response) {
+    this.stubs.track({url: urlOrRegExp, method, response});
   },
 
   /**
