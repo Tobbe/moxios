@@ -59,7 +59,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.createMoxios = undefined;
+	exports.Moxios = undefined;
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
@@ -91,6 +91,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createError2 = _interopRequireDefault(_createError);
 	
+	var _classAutobind = __webpack_require__(11);
+	
+	var _classAutobind2 = _interopRequireDefault(_classAutobind);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -98,72 +102,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	var TimeoutException = new Error('Timeout: Stub function not called.');
 	var DEFAULT_WAIT_DELAY = 100;
 	
-	// The default adapter
-	var defaultAdapter = void 0;
-	
-	/**
-	 * The mock adapter that gets installed.
-	 *
-	 * @param {Function} resolve The function to call when Promise is resolved
-	 * @param {Function} reject The function to call when Promise is rejected
-	 * @param {Object} config The config object to be used for the request
-	 */
-	var mockAdapter = function mockAdapter(config) {
-	  return new Promise(function (resolve, reject) {
-	    var request = new Request(resolve, reject, config);
-	    moxios.requests.track(request);
-	    var hasBaseUrl = config && config.baseURL && true;
-	
-	    // Check for matching stub to auto respond with
-	    for (var i = 0, l = moxios.stubs.count(); i < l; i++) {
-	      var stub = moxios.stubs.at(i);
-	      var url = hasBaseUrl ? config.baseURL + stub.url : stub.url;
-	      var correctURL = stub.url instanceof RegExp ? stub.url.test(request.url) : url === request.url;
-	      var correctMethod = true;
-	
-	      if (stub.method !== undefined) {
-	        correctMethod = stub.method.toLowerCase() === request.config.method.toLowerCase();
-	      }
-	
-	      if (correctURL && correctMethod) {
-	        if (stub.timeout) {
-	          throwTimeout(config);
-	        }
-	        if (typeof stub.response === 'function') {
-	          request.respondWith(stub.response(request));
-	        } else {
-	          request.respondWith(stub.response);
-	        }
-	        stub.resolve();
-	        break;
-	      }
-	    }
-	  });
-	};
-	
-	/**
-	 * create common object for timeout response
-	 *
-	 * @param {object} config The config object to be used for the request
-	 */
-	var createTimeout = function createTimeout(config) {
-	  return (0, _createError2.default)('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED');
-	};
-	
-	/**
-	 * throw common error for timeout response
-	 *
-	 * @param {object} config The config object to be used for the request
-	 */
-	var throwTimeout = function throwTimeout(config) {
-	  throw createTimeout(config);
-	};
-	
 	var Tracker = function () {
 	  function Tracker() {
 	    _classCallCheck(this, Tracker);
 	
 	    this.__items = [];
+	
+	    (0, _classAutobind2.default)(this);
 	  }
 	
 	  /**
@@ -261,7 +206,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + '.' + date.getMilliseconds();
 	      }
 	
-	      console.log();
 	      this.__items.forEach(function (element) {
 	        var output = formatDate(element.timestamp) + ' ';
 	
@@ -330,87 +274,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Tracker;
 	}();
 	
-	var Request = function () {
-	  /**
-	   * Create a new Request object
-	   *
-	   * @param {Function} resolve The function to call when Promise is resolved
-	   * @param {Function} reject The function to call when Promise is rejected
-	   * @param {Object} config The config object to be used for the request
-	   */
-	  function Request(resolve, reject, config) {
-	    _classCallCheck(this, Request);
-	
-	    this.resolve = resolve;
-	    this.reject = reject;
-	    this.config = config;
-	    this.timestamp = new Date();
-	
-	    this.headers = config.headers;
-	    this.url = (0, _buildURL2.default)(config.url, config.params, config.paramsSerializer);
-	    this.timeout = config.timeout;
-	    this.withCredentials = config.withCredentials || false;
-	    this.responseType = config.responseType;
-	
-	    // Set auth header
-	    if (config.auth) {
-	      var username = config.auth.username || '';
-	      var password = config.auth.password || '';
-	      this.headers.Authorization = 'Basic ' + (0, _btoa2.default)(username + ':' + password);
-	    }
-	
-	    // Set xsrf header
-	    if (typeof document !== 'undefined' && typeof document.cookie !== 'undefined') {
-	      var xsrfValue = config.withCredentials || (0, _isURLSameOrigin2.default)(config.url) ? _cookies2.default.read(config.xsrfCookieName) : undefined;
-	
-	      if (xsrfValue) {
-	        this.headers[config.xsrfHeaderName] = xsrfValue;
-	      }
-	    }
-	  }
-	
-	  /**
-	   * Respond to this request with a timeout result
-	   *
-	   * @return {Promise} A Promise that rejects with a timeout result
-	   */
-	
-	
-	  _createClass(Request, [{
-	    key: 'respondWithTimeout',
-	    value: function respondWithTimeout() {
-	      var response = new Response(this, createTimeout(this.config));
-	      (0, _settle2.default)(this.resolve, this.reject, response);
-	      return new Promise(function (resolve, reject) {
-	        moxios.wait(function () {
-	          reject(response);
-	        });
-	      });
-	    }
-	
-	    /**
-	     * Respond to this request with a specified result
-	     *
-	     * @param {Object} res The data representing the result of the request
-	     * @return {Promise} A Promise that resolves once the response is ready
-	     */
-	
-	  }, {
-	    key: 'respondWith',
-	    value: function respondWith(res) {
-	      var response = new Response(this, res);
-	      (0, _settle2.default)(this.resolve, this.reject, response);
-	      return new Promise(function (resolve) {
-	        moxios.wait(function () {
-	          resolve(response);
-	        });
-	      });
-	    }
-	  }]);
-	
-	  return Request;
-	}();
-	
 	var Response =
 	/**
 	 * Create a new Response object
@@ -439,35 +302,198 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.code = res.code;
 	};
 	
-	var createMoxios = exports.createMoxios = function createMoxios() {
-	  var defaultInstance = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _axios2.default;
+	var Request = function () {
+	  /**
+	   * Create a new Request object
+	   *
+	   * @param {Function} resolve The function to call when Promise is resolved
+	   * @param {Function} reject The function to call when Promise is rejected
+	   * @param {Object} config The config object to be used for the request
+	   * @param {Object} moxios The moxios instance to use
+	   */
+	  function Request(resolve, reject, config, moxios) {
+	    _classCallCheck(this, Request);
 	
-	  return {
-	    stubs: new Tracker(),
-	    requests: new Tracker(),
-	    delay: DEFAULT_WAIT_DELAY,
-	    timeoutException: TimeoutException,
+	    this.resolve = resolve;
+	    this.reject = reject;
+	    this.config = config;
+	    this.timestamp = new Date();
+	    this.moxios = moxios;
+	
+	    this.headers = config.headers;
+	    this.url = (0, _buildURL2.default)(config.url, config.params, config.paramsSerializer);
+	    this.timeout = config.timeout;
+	    this.withCredentials = config.withCredentials || false;
+	    this.responseType = config.responseType;
+	
+	    // Set auth header
+	    if (config.auth) {
+	      var username = config.auth.username || '';
+	      var password = config.auth.password || '';
+	      this.headers.Authorization = 'Basic ' + (0, _btoa2.default)(username + ':' + password);
+	    }
+	
+	    // Set xsrf header
+	    if (typeof document !== 'undefined' && typeof document.cookie !== 'undefined') {
+	      var xsrfValue = config.withCredentials || (0, _isURLSameOrigin2.default)(config.url) ? _cookies2.default.read(config.xsrfCookieName) : undefined;
+	
+	      if (xsrfValue) {
+	        this.headers[config.xsrfHeaderName] = xsrfValue;
+	      }
+	    }
+	
+	    (0, _classAutobind2.default)(this);
+	  }
+	
+	  /**
+	   * Respond to this request with a timeout result
+	   *
+	   * @return {Promise} A Promise that rejects with a timeout result
+	   */
+	
+	
+	  _createClass(Request, [{
+	    key: 'respondWithTimeout',
+	    value: function respondWithTimeout() {
+	      var _this = this;
+	
+	      var response = new Response(this, this.moxios.createTimeout(this.config));
+	      (0, _settle2.default)(this.resolve, this.reject, response);
+	      return new Promise(function (resolve, reject) {
+	        _this.moxios.wait(function () {
+	          reject(response);
+	        });
+	      });
+	    }
 	
 	    /**
-	     * Install the mock adapter for axios
+	     * Respond to this request with a specified result
+	     *
+	     * @param {Object} res The data representing the result of the request
+	     * @return {Promise} A Promise that resolves once the response is ready
 	     */
-	    install: function install() {
-	      var instance = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultInstance;
 	
-	      defaultAdapter = instance.defaults.adapter;
-	      instance.defaults.adapter = mockAdapter;
-	    },
+	  }, {
+	    key: 'respondWith',
+	    value: function respondWith(res) {
+	      var _this2 = this;
+	
+	      var response = new Response(this, res);
+	      (0, _settle2.default)(this.resolve, this.reject, response);
+	      return new Promise(function (resolve) {
+	        _this2.moxios.wait(function () {
+	          resolve(response);
+	        });
+	      });
+	    }
+	  }]);
+	
+	  return Request;
+	}();
+	
+	var Moxios = exports.Moxios = function () {
+	  function Moxios(defaultInstance) {
+	    _classCallCheck(this, Moxios);
+	
+	    this.defaultAdapter = null;
+	    this.defaultInstance = defaultInstance || _axios2.default;
+	    this.stubs = new Tracker();
+	    this.requests = new Tracker();
+	    this.delay - DEFAULT_WAIT_DELAY;
+	    this.timeoutException = TimeoutException;
+	
+	    (0, _classAutobind2.default)(this);
+	  }
+	
+	  /**
+	   * The mock adapter that gets installed.
+	   *
+	   * @param {Function} resolve The function to call when Promise is resolved
+	   * @param {Function} reject The function to call when Promise is rejected
+	   * @param {Object} config The config object to be used for the request
+	   */
+	
+	
+	  _createClass(Moxios, [{
+	    key: 'mockAdapter',
+	    value: function mockAdapter(config) {
+	      var _this3 = this;
+	
+	      return new Promise(function (resolve, reject) {
+	        var request = new Request(resolve, reject, config, _this3);
+	        _this3.requests.track(request);
+	        var hasBaseUrl = config && config.baseURL && true;
+	
+	        // Check for matching stub to auto respond with
+	        for (var i = 0, l = _this3.stubs.count(); i < l; i++) {
+	          var stub = _this3.stubs.at(i);
+	          var url = hasBaseUrl ? config.baseURL + stub.url : stub.url;
+	          var correctURL = stub.url instanceof RegExp ? stub.url.test(request.url) : url === request.url;
+	          var correctMethod = true;
+	
+	          if (stub.method !== undefined) {
+	            correctMethod = stub.method.toLowerCase() === request.config.method.toLowerCase();
+	          }
+	
+	          if (correctURL && correctMethod) {
+	            if (stub.timeout) {
+	              _this3.throwTimeout(config);
+	            }
+	            if (typeof stub.response === 'function') {
+	              request.respondWith(stub.response(request));
+	            } else {
+	              request.respondWith(stub.response);
+	            }
+	            stub.resolve();
+	            break;
+	          }
+	        }
+	      });
+	    }
+	
+	    /**
+	     * create common object for timeout response
+	     *
+	     * @param {object} config The config object to be used for the request
+	     */
+	
+	  }, {
+	    key: 'createTimeout',
+	    value: function createTimeout(config) {
+	      return (0, _createError2.default)('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED');
+	    }
+	
+	    /**
+	     * throw common error for timeout response
+	     *
+	     * @param {object} config The config object to be used for the request
+	     */
+	
+	  }, {
+	    key: 'throwTimeout',
+	    value: function throwTimeout(config) {
+	      throw this.createTimeout(config);
+	    }
+	  }, {
+	    key: 'install',
+	    value: function install(axiosInstance) {
+	      var i = axiosInstance || this.defaultInstance;
+	      this.defaultAdapter = i.defaults.adapter;
+	      i.defaults.adapter = this.mockAdapter;
+	    }
 	
 	    /**
 	     * Uninstall the mock adapter and reset state
 	     */
-	    uninstall: function uninstall() {
-	      var instance = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultInstance;
 	
-	      instance.defaults.adapter = defaultAdapter;
+	  }, {
+	    key: 'uninstall',
+	    value: function uninstall(axiosInstance) {
+	      var i = axiosInstance || this.defaultInstance;
+	      i.defaults.adapter = this.defaultAdapter;
 	      this.stubs.reset();
 	      this.requests.reset();
-	    },
+	    }
 	
 	    /**
 	     * Stub a response to be used to respond to a request matching a method and a URL or RegExp
@@ -476,9 +502,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {String|RegExp} urlOrRegExp A URL or RegExp to test against
 	     * @param {Object} response The response to use when a match is made
 	     */
-	    stubRequest: function stubRequest(method, urlOrRegExp, response) {
+	
+	  }, {
+	    key: 'stubRequest',
+	    value: function stubRequest(method, urlOrRegExp, response) {
 	      this.stubs.track({ url: urlOrRegExp, method: method, response: response });
-	    },
+	    }
 	
 	    /**
 	     * Stub a response to be used one or more times to respond to a request matching a
@@ -488,13 +517,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {String|RegExp} urlOrRegExp A URL or RegExp to test against
 	     * @param {Object} response The response to use when a match is made
 	     */
-	    stubOnce: function stubOnce(method, urlOrRegExp, response) {
-	      var _this = this;
+	
+	  }, {
+	    key: 'stubOnce',
+	    value: function stubOnce(method, urlOrRegExp, response) {
+	      var _this4 = this;
 	
 	      return new Promise(function (resolve) {
-	        _this.stubs.track({ url: urlOrRegExp, method: method, response: response, resolve: resolve });
+	        _this4.stubs.track({ url: urlOrRegExp, method: method, response: response, resolve: resolve });
 	      });
-	    },
+	    }
 	
 	    /**
 	     * Stub a timed response to a request matching a method and a URL or RegExp. If
@@ -505,41 +537,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {String|RegExp} urlOrRegExp A URL or RegExp to test against
 	     * @param {Object} response The response to use when a match is made
 	     */
-	    stubFailure: function stubFailure(method, urlOrRegExp, response) {
-	      var _this2 = this;
+	
+	  }, {
+	    key: 'stubFailure',
+	    value: function stubFailure(method, urlOrRegExp, response) {
+	      var _this5 = this;
 	
 	      return new Promise(function (resolve, reject) {
-	        _this2.stubs.track({ url: urlOrRegExp, method: method, response: response, resolve: resolve });
+	        _this5.stubs.track({ url: urlOrRegExp, method: method, response: response, resolve: resolve });
 	        setTimeout(function () {
 	          reject(TimeoutException);
 	        }, 500);
 	      });
-	    },
+	    }
 	
 	    /**
 	     * Stub a timeout to be used to respond to a request matching a URL or RegExp
 	     *
 	     * @param {String|RegExp} urlOrRegExp A URL or RegExp to test against
 	     */
-	    stubTimeout: function stubTimeout(urlOrRegExp) {
+	
+	  }, {
+	    key: 'stubTimeout',
+	    value: function stubTimeout(urlOrRegExp) {
 	      this.stubs.track({ url: urlOrRegExp, timeout: true });
-	    },
+	    }
 	
 	    /**
 	     * Run a single test with mock adapter installed.
-	     * This will install the mock adapter, execute the function provided,
+	     * moxios will install the mock adapter, execute the function provided,
 	     * then uninstall the mock adapter once complete.
 	     *
 	     * @param {Function} fn The function to be executed
 	     */
-	    withMock: function withMock(fn) {
+	
+	  }, {
+	    key: 'withMock',
+	    value: function withMock(fn) {
 	      this.install();
 	      try {
 	        fn();
 	      } finally {
 	        this.uninstall();
 	      }
-	    },
+	    }
 	
 	    /**
 	     * Wait for request to be made before proceding.
@@ -551,7 +592,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	     *
 	     * @return {Object} Promise that gets resolved when waiting completed
 	     */
-	    wait: function wait() {
+	
+	  }, {
+	    key: 'wait',
+	    value: function wait() {
 	      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
 	        args[_key] = arguments[_key];
 	      }
@@ -563,12 +607,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        setTimeout(resolve, delay);
 	      }).then(cb);
 	    }
-	  };
-	};
+	  }]);
 	
-	var moxios = createMoxios();
+	  return Moxios;
+	}();
 	
-	exports.default = moxios;
+	var defaultMoxiosInstance = new Moxios();
+	
+	exports.default = defaultMoxiosInstance;
 
 /***/ }),
 /* 1 */
@@ -1225,6 +1271,63 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return error;
 	};
 
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	exports.__esModule = true;
+	exports.default = autobind;
+	
+	
+	// The following React methods should not be automatically bound.
+	var REACT_EXCLUDE_METHODS = {
+	  getChildContext: true,
+	  render: true,
+	  componentWillMount: true,
+	  componentDidMount: true,
+	  componentWillReceiveProps: true,
+	  shouldComponentUpdate: true,
+	  componentWillUpdate: true,
+	  componentDidUpdate: true,
+	  componentWillUnmount: true
+	};
+	
+	function isExcluded(methodName) {
+	  return REACT_EXCLUDE_METHODS[methodName] === true;
+	}
+	
+	function isFunction(item) {
+	  return typeof item === 'function';
+	}
+	
+	function autobind(instance, proto) {
+	  if (proto == null) {
+	    proto = Object.getPrototypeOf(instance);
+	  }
+	  var propertyNames = Object.getOwnPropertyNames(proto);
+	  for (var _iterator = propertyNames, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+	    var _ref;
+	
+	    if (_isArray) {
+	      if (_i >= _iterator.length) break;
+	      _ref = _iterator[_i++];
+	    } else {
+	      _i = _iterator.next();
+	      if (_i.done) break;
+	      _ref = _i.value;
+	    }
+	
+	    var name = _ref;
+	
+	    var value = proto[name];
+	    if (isFunction(value) && !isExcluded(name)) {
+	      instance[name] = proto[name].bind(instance);
+	    }
+	  }
+	}
 
 /***/ })
 /******/ ])
