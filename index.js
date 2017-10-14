@@ -308,7 +308,7 @@ class Response {
   }
 }
 
-export const createMoxios = () => {
+export const createMoxios = (defaultInstance = axios) => {
   return {
     stubs: new Tracker(),
     requests: new Tracker(),
@@ -318,7 +318,7 @@ export const createMoxios = () => {
     /**
      * Install the mock adapter for axios
      */
-    install: function(instance = axios) {
+    install: function(instance = defaultInstance) {
       defaultAdapter = instance.defaults.adapter
       instance.defaults.adapter = mockAdapter
     },
@@ -326,7 +326,7 @@ export const createMoxios = () => {
     /**
      * Uninstall the mock adapter and reset state
      */
-    uninstall: function(instance = axios) {
+    uninstall: function(instance = defaultInstance) {
       instance.defaults.adapter = defaultAdapter
       this.stubs.reset()
       this.requests.reset()

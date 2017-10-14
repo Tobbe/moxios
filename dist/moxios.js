@@ -440,6 +440,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	var createMoxios = exports.createMoxios = function createMoxios() {
+	  var defaultInstance = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _axios2.default;
+	
 	  return {
 	    stubs: new Tracker(),
 	    requests: new Tracker(),
@@ -450,7 +452,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * Install the mock adapter for axios
 	     */
 	    install: function install() {
-	      var instance = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _axios2.default;
+	      var instance = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultInstance;
 	
 	      defaultAdapter = instance.defaults.adapter;
 	      instance.defaults.adapter = mockAdapter;
@@ -460,7 +462,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * Uninstall the mock adapter and reset state
 	     */
 	    uninstall: function uninstall() {
-	      var instance = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _axios2.default;
+	      var instance = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultInstance;
 	
 	      instance.defaults.adapter = defaultAdapter;
 	      this.stubs.reset();
