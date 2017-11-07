@@ -467,13 +467,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  /**
 	   * Stub a response to be used to respond to a request matching a method and a URL or RegExp
+	   * The first parameter is optional for backwards compatability reasons. It might change to
+	   * a required parameter in the future. Please always specify a method
 	   *
-	   * @param {String} method An axios command
+	   * @param {String} [method] An axios command
 	   * @param {String|RegExp} urlOrRegExp A URL or RegExp to test against
 	   * @param {Object} response The response to use when a match is made
 	   */
-	  stubRequest: function stubRequest(urlOrRegExp, response) {
-	    this.stubs.track({ url: urlOrRegExp, response: response });
+	  stubRequest: function stubRequest() {
+	    if (arguments.length === 3) {
+	      this.stubs.track({ method: arguments.length <= 0 ? undefined : arguments[0], url: arguments.length <= 1 ? undefined : arguments[1], response: arguments.length <= 2 ? undefined : arguments[2] });
+	    } else {
+	      this.stubs.track({ url: arguments.length <= 0 ? undefined : arguments[0], response: arguments.length <= 1 ? undefined : arguments[1] });
+	    }
 	  },
 	
 	  /**
